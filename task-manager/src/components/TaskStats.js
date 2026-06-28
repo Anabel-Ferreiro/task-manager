@@ -19,9 +19,10 @@ export default function TaskStats({ total, completed, active, onClearCompleted }
     // flex + justify-between puts counts on left, button on right.
     <div className="flex items-center justify-between mb-6 p-4 bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl">
 
-      {/* Derived values passed as props from TaskBoard.
-          These update automatically whenever tasks state changes
-          because TaskBoard re-renders and passes new values down. */}
+      {/* These values are derived in TaskBoard from the tasks array, not stored as separate state because that would create
+       duplication: if tasks updated but the counters didn't, the UI would show wrong numbers (sync bug).
+       Instead, TaskBoard recomputes them every render from tasks,then passes them down as props. When tasks state changes →
+       TaskBoard re-renders → new values calculated → new props passed here → TaskStats updates automatically. */}
       <div className="flex gap-4 text-sm">
         <span>
           <span className="font-bold text-purple-700 text-lg">{total}</span>
@@ -45,9 +46,9 @@ export default function TaskStats({ total, completed, active, onClearCompleted }
         </span>
       </div>
 
-      {/* Clear completed button: fires onClearCompleted callback.
-          TaskBoard receives it and filters out all done tasks.
-          Conditional render: only show when there are completed tasks. */}
+      {/* Clear completed button uses short-circuit rendering (&&). When completed === 0, React skips rendering this button entirely —
+       no unnecessary DOM node is created. This prevents the user from clicking "Clear" when there's nothing to clear.
+       onClearCompleted is owned by TaskBoard because it modifies task state — data always flows down, events flow up. */}
       {completed > 0 && (
         <button
           onClick={onClearCompleted}

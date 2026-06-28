@@ -26,17 +26,19 @@ export default function TaskList({ tasks, onToggle, onDelete }) {
   return (
     // ul is semantic HTML for a list of items. divide-y adds a border between each list item automatically.
     <ul className="divide-y divide-purple-100">
-      {/* .map() turns the tasks array into JSX elements.
-          key={task.id} is required — React uses it to track
-          which items changed, were added, or were removed.
-          Use the unique id (not the array index) because
-          index-as-key causes bugs when items are reordered. */}
+      {/* key={task.id} is required by React's reconciliation algorithm.
+         React uses it to identify which items changed, were added,
+         or removed between renders, without it, React would re-render
+         the entire list on every change instead of only the affected item.
+         I use task.id (not array index) because if items are reordered
+         or deleted, index-as-key causes React to match the wrong elements
+         and produce silent UI bugs. */}
+      
       {tasks.map((task) => (
         <li key={task.id}>
-          {/* Each TaskCard receives its own data and the
-              callbacks from TaskBoard via TaskList.
-              TaskList doesn't own these callbacks, it just
-              passes them through (prop drilling). */}
+          {/* Each TaskCard receives its own data and the callbacks
+              from TaskBoard via TaskList.TaskBoard is the single source of truth for task state, so it must own all handlers that modify that state.
+              TaskList doesn't own these callbacks, it just passes them through (prop drilling) so data flow stays top-down. */}
           <TaskCard
             id={task.id}
             title={task.title}

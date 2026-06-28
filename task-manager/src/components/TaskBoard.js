@@ -28,7 +28,11 @@ export default function TaskBoard() {
 
   useEffect(() => {
   const saved = localStorage.getItem('tasks');
-  setTasks(saved ? JSON.parse(saved) : []);
+  if (saved) {
+    setTasks(JSON.parse(saved));
+  } else {
+    setTasks([]);
+  }
 }, []);
   
 // ----------EFFECT: Persist to localStorage ------------------

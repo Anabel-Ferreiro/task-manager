@@ -58,6 +58,9 @@ useEffect(() => {
   const active = tasks.length - completed;
 
   // visible is derived from both tasks and filter, it doesn't need its own state, just recalculates each render.
+  // 'all' → show everything
+ // 'done' → only completed tasks (done === true)
+ // 'active' → only incomplete tasks (done === false)
   const visible =
     filter === 'all' ? tasks :
     filter === 'done' ? tasks.filter((t) => t.done) :

@@ -23,23 +23,21 @@ export default function TaskBoard() {
   // -----------EFFECT: Load from localStorage on mount ----------------
   // Runs once on client mount (empty dependency array []). Can't read localStorage in useState directly because
   // Next.js pre-renders on the server where localStorage doesn't exist. This useEffect only runs in the browser.
+  // I intentionally chose useEffect over a lazy initializer so the server and client render the same initial HTML,
+  // preventing hydration warnings.
 
   useEffect(() => {
-    const saved = localStorage.getItem('tasks');
-    setTasks(saved ? JSON.parse(saved) : [
-      { id: 't1', title: 'Buy groceries', done: false },
-      { id: 't2', title: 'Finish homework', done: false },
-      { id: 't3', title: 'Call mom', done: false },
-    ]);
-  }, []);
+  const saved = localStorage.getItem('tasks');
+  setTasks(saved ? JSON.parse(saved) : []);
+}, []);
   
-  // ----------EFFECT: Persist to localStorage ------------------
-  // Runs after every render where tasks changed. [tasks] dependency array means: skip if tasks didn't change.
-  // This syncs React state with the browser's localStorage, so tasks survive a page refresh.
-  useEffect(() => {
-    if (tasks.length === 0) return;
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-  }, [tasks]);
+// ----------EFFECT: Persist to localStorage ------------------
+// Runs after every render where tasks changed.
+// Saves even an empty array so deleting all tasks  is correctly persisted, without this, cleared tasks
+// would reappear on refresh.
+useEffect(() => {
+  localStorage.setItem('tasks', JSON.stringify(tasks));
+}, [tasks]);
 
   // ----------- EFFECT: Update browser tab title -----------------
   // Syncs document.title with the number of active tasks. Cleanup function resets the title when component unmounts.
